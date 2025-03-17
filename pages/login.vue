@@ -140,7 +140,6 @@ const formData = reactive({
 	password: '',
 });
 
-
 // Login function
 const login = async () => {
 	try {

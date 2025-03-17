@@ -140,7 +140,6 @@ onMounted(async () => {
 	}
 });
 
-
 const handleRegister = async () => {
 	loading.value = true;
 	error.value = '';

@@ -1,221 +1,234 @@
 <template>
 	<div class="min-h-screen bg-gray-50 flex flex-col">
-	  <!-- Navigation -->
-	  <nav class="bg-white shadow">
-		<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-		  <div class="relative flex justify-between h-16">
-			<!-- Left side: Logo & Desktop Links -->
-			<div class="flex items-center">
-			  <div class="flex-shrink-0 flex items-center">
-				<NuxtLink to="/" class="text-xl font-bold text-indigo-600">
-				  FoodBookmark
-				</NuxtLink>
-			  </div>
-			  <div class="hidden sm:flex sm:ml-6 sm:space-x-8">
-				<NuxtLink
-				  v-if="isLoggedIn"
-				  to="/search"
-				  class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-				  active-class="border-indigo-500 text-gray-900"
-				>
-				  Search
-				</NuxtLink>
-				<!-- Logged in only -->
-				<NuxtLink
-				  v-if="isLoggedIn"
-				  to="/bookmarks"
-				  class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-				  active-class="border-indigo-500 text-gray-900"
-				>
-				  My Bookmarks
-				</NuxtLink>
-			  </div>
-			</div>
-  
-			<!-- Right side: Auth Buttons / Profile Dropdown & Mobile Menu Button -->
-			<div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-			  <template v-if="isLoggedIn">
-				<!-- Profile dropdown -->
-				<div class="relative">
-				  <button
-					class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-					@click.stop="profileMenuOpen = !profileMenuOpen"
-				  >
-					<span class="sr-only">Open user menu</span>
-					<div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500">
-					  {{ user?.username?.charAt(0).toUpperCase() || 'U' }}
+		<!-- Navigation -->
+		<nav class="bg-white shadow">
+			<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+				<div class="relative flex justify-between h-16">
+					<!-- Left side: Logo & Desktop Links -->
+					<div class="flex items-center">
+						<div class="flex-shrink-0 flex items-center">
+							<NuxtLink
+								to="/"
+								class="text-xl font-bold text-indigo-600"
+							>
+								FoodBookmark
+							</NuxtLink>
+						</div>
+						<div class="hidden sm:flex sm:ml-6 sm:space-x-8">
+							<NuxtLink
+								v-if="isLoggedIn"
+								to="/search"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+								active-class="border-indigo-500 text-gray-900"
+							>
+								Search
+							</NuxtLink>
+							<!-- Logged in only -->
+							<NuxtLink
+								v-if="isLoggedIn"
+								to="/bookmarks"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+								active-class="border-indigo-500 text-gray-900"
+							>
+								My Bookmarks
+							</NuxtLink>
+						</div>
 					</div>
-				  </button>
-				  <div
-					v-if="profileMenuOpen"
-					class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-				  >
-					<NuxtLink
-					  to="/profile"
-					  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-					>
-					  Your Profile
-					</NuxtLink>
-					<button
-					  class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-					  @click="logout"
-					>
-					  Sign out
-					</button>
-				  </div>
+
+					<!-- Right side: Auth Buttons / Profile Dropdown & Mobile Menu Button -->
+					<div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+						<template v-if="isLoggedIn">
+							<!-- Profile dropdown -->
+							<div class="relative">
+								<button
+									class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+									@click.stop="profileMenuOpen = !profileMenuOpen"
+								>
+									<span class="sr-only">Open user menu</span>
+									<div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-500">
+										{{ user?.username?.charAt(0).toUpperCase() || 'U' }}
+									</div>
+								</button>
+								<div
+									v-if="profileMenuOpen"
+									class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+								>
+									<NuxtLink
+										to="/profile"
+										class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+									>
+										Your Profile
+									</NuxtLink>
+									<button
+										class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+										@click="logout"
+									>
+										Sign out
+									</button>
+								</div>
+							</div>
+						</template>
+						<template v-else>
+							<NuxtLink
+								to="/login"
+								class="text-sm font-medium text-indigo-600 hover:text-indigo-500 mr-4"
+							>
+								Sign in
+							</NuxtLink>
+							<NuxtLink
+								to="/register"
+								class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+							>
+								Sign up
+							</NuxtLink>
+						</template>
+
+						<!-- Mobile menu button -->
+						<div class="sm:hidden">
+							<button
+								class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+								@click="mobileMenuOpen = !mobileMenuOpen"
+							>
+								<span class="sr-only">Open main menu</span>
+								<svg
+									v-if="!mobileMenuOpen"
+									class="block h-6 w-6"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+								<svg
+									v-else
+									class="block h-6 w-6"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
 				</div>
-			  </template>
-			  <template v-else>
-				<NuxtLink
-				  to="/login"
-				  class="text-sm font-medium text-indigo-600 hover:text-indigo-500 mr-4"
-				>
-				  Sign in
-				</NuxtLink>
-				<NuxtLink
-				  to="/register"
-				  class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-				>
-				  Sign up
-				</NuxtLink>
-			  </template>
-  
-			  <!-- Mobile menu button -->
-			  <div class="sm:hidden">
-				<button
-				  class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-				  @click="mobileMenuOpen = !mobileMenuOpen"
-				>
-				  <span class="sr-only">Open main menu</span>
-				  <svg
-					v-if="!mobileMenuOpen"
-					class="block h-6 w-6"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					aria-hidden="true"
-				  >
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					  d="M4 6h16M4 12h16M4 18h16"/>
-				  </svg>
-				  <svg
-					v-else
-					class="block h-6 w-6"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					aria-hidden="true"
-				  >
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-					  d="M6 18L18 6M6 6l12 12"/>
-				  </svg>
-				</button>
-			  </div>
 			</div>
-		  </div>
-		</div>
-  
-		<!-- Mobile menu -->
-		<div v-if="mobileMenuOpen" class="sm:hidden">
-		  <div class="pt-2 pb-3 space-y-1">
-			<NuxtLink
-			  to="/"
-			  class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-			  active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
-			  exact
+
+			<!-- Mobile menu -->
+			<div
+				v-if="mobileMenuOpen"
+				class="sm:hidden"
 			>
-			  Home
-			</NuxtLink>
-			<NuxtLink
-			  to="/search"
-			  class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-			  active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
-			>
-			  Search
-			</NuxtLink>
-			<NuxtLink
-			  v-if="isLoggedIn"
-			  to="/bookmarks"
-			  class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-			  active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
-			>
-			  My Bookmarks
-			</NuxtLink>
-			<template v-if="!isLoggedIn">
-			  <NuxtLink
-				to="/login"
-				class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-				active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
-			  >
-				Sign in
-			  </NuxtLink>
-			  <NuxtLink
-				to="/register"
-				class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-				active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
-			  >
-				Sign up
-			  </NuxtLink>
-			</template>
-		  </div>
-		</div>
-	  </nav>
-  
-	  <!-- Main content -->
-	  <main class="flex-grow py-4 px-4 sm:px-6 lg:px-8">
-		<slot />
-	  </main>
-  
-	  <!-- Footer -->
-	  <footer class="bg-white py-4 border-t border-gray-200">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		  <p class="text-center text-sm text-gray-500">
-			&copy; {{ new Date().getFullYear() }} FoodBookmark. All rights reserved.
-		  </p>
-		</div>
-	  </footer>
+				<div class="pt-2 pb-3 space-y-1">
+					<NuxtLink
+						to="/"
+						class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+						active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
+						exact
+					>
+						Home
+					</NuxtLink>
+					<NuxtLink
+						to="/search"
+						class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+						active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
+					>
+						Search
+					</NuxtLink>
+					<NuxtLink
+						v-if="isLoggedIn"
+						to="/bookmarks"
+						class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+						active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
+					>
+						My Bookmarks
+					</NuxtLink>
+					<template v-if="!isLoggedIn">
+						<NuxtLink
+							to="/login"
+							class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+							active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
+						>
+							Sign in
+						</NuxtLink>
+						<NuxtLink
+							to="/register"
+							class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+							active-class="bg-indigo-50 border-indigo-500 text-indigo-700"
+						>
+							Sign up
+						</NuxtLink>
+					</template>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Main content -->
+		<main class="flex-grow py-4 px-4 sm:px-6 lg:px-8">
+			<slot />
+		</main>
+
+		<!-- Footer -->
+		<footer class="bg-white py-4 border-t border-gray-200">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<p class="text-center text-sm text-gray-500">
+					&copy; {{ new Date().getFullYear() }} FoodBookmark. All rights reserved.
+				</p>
+			</div>
+		</footer>
 	</div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useAuthStore } from '~/stores/auth';
-  
-  const authStore = useAuthStore();
-  const router = useRouter();
-  
-  const mobileMenuOpen = ref(false);
-  const profileMenuOpen = ref(false);
-  
-  const isLoggedIn = computed(() => authStore.isLoggedIn);
-  const user = computed(() => authStore.user);
-  
-  onMounted(() => {
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '~/stores/auth';
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+const mobileMenuOpen = ref(false);
+const profileMenuOpen = ref(false);
+
+const isLoggedIn = computed(() => authStore.isLoggedIn);
+const user = computed(() => authStore.user);
+
+onMounted(() => {
 	// Initialize auth state on app mount
 	authStore.initAuth();
-  
+
 	// Close the profile menu if clicking outside
 	document.addEventListener('click', (e) => {
-	  const profileMenu = document.querySelector('.origin-top-right');
-	  const profileButton = document.querySelector('.rounded-full.flex');
-	  if (
-		profileMenuOpen.value &&
-		profileMenu &&
-		profileButton &&
-		!profileMenu.contains(e.target as Node) &&
-		!profileButton.contains(e.target as Node)
-	  ) {
-		profileMenuOpen.value = false;
-	  }
+		const profileMenu = document.querySelector('.origin-top-right');
+		const profileButton = document.querySelector('.rounded-full.flex');
+		if (
+			profileMenuOpen.value
+			&& profileMenu
+			&& profileButton
+			&& !profileMenu.contains(e.target as Node)
+			&& !profileButton.contains(e.target as Node)
+		) {
+			profileMenuOpen.value = false;
+		}
 	});
-  });
-  
-  const logout = async () => {
+});
+
+const logout = async () => {
 	await authStore.logout();
 	router.push('/login');
-  };
-  </script>
-  
+};
+</script>
