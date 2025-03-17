@@ -1,0 +1,10 @@
+{
+    "plugins": ["nuxt"],
+    "extends": [
+      "eslint:recommended",
+      "plugin:nuxt/recommended"
+    ],
+    "rules": {
+      // Add your stylistic rules here
+    }
+  }
