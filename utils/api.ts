@@ -15,6 +15,7 @@ api.interceptors.request.use(
 	(config) => {
 		const token = localStorage.getItem('token');
 		if (token && config.headers) {
+		// Make sure the token is properly formatted
 			config.headers.Authorization = `Bearer ${token}`;
 		}
 		return config;
@@ -75,5 +76,12 @@ export const authApi = {
 		api.post('/auth/logout'),
 
 	getCurrentUser: () =>
-		api.get('/auth/user'),
+		api.get('/auth/me'),
+};
+
+export const searchApi = {
+	search: (query: string, page: number, limit: number) =>
+		api.get('/search', { params: { q: query, page, per_page: limit } }),
+	getRecipe: (recipeId: number) =>
+		api.get(`/recipe/${recipeId}`),
 };

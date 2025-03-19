@@ -37,16 +37,23 @@ export const useAuthStore = defineStore('auth', {
 			const refreshToken = localStorage.getItem('refreshToken');
 
 			if (token) {
+				console.log('Token found in localStorage:', token.substring(0, 10) + '...');
 				this.token = token;
 				this.refreshToken = refreshToken;
 				this.isAuthenticated = true;
 
 				try {
 					// Get current user data
+					console.log('Attempting to fetch user data with token');
 					const response = await authApi.getCurrentUser();
-					this.user = response.data;
+					this.user = response.data.user; // Note: the backend returns data wrapped in a "user" field
 				}
-				catch (_error: unknown) {
+				catch (error) {
+					console.error('Error fetching user data:', error);
+					if (error instanceof AxiosError) {
+						console.error('Status:', error.response?.status);
+						console.error('Response data:', error.response?.data);
+					}
 					this.logout();
 				}
 			}
@@ -128,8 +135,12 @@ export const useAuthStore = defineStore('auth', {
 					await authApi.logout();
 				}
 			}
-			catch (_error: unknown) {
-				// Continue with logout even if API call fails
+			catch (error) {
+				console.error('Logout API call failed:', error);
+				// Log more details about the error
+				if (error instanceof AxiosError && error.response) {
+					console.error('Response data:', error.response.data);
+				}
 			}
 			finally {
 				// Clear state and localStorage
@@ -139,6 +150,7 @@ export const useAuthStore = defineStore('auth', {
 				this.isAuthenticated = false;
 				localStorage.removeItem('token');
 				localStorage.removeItem('refreshToken');
+				console.log('Clearing localStorage on logout');
 				this.loading = false;
 			}
 		},
