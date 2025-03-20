@@ -9,6 +9,11 @@ export default defineNuxtConfig({
 		'@nuxt/eslint',
 	],
 	devtools: { enabled: true },
+	runtimeConfig: {
+		public: {
+			apiBaseUrl: 'http://localhost:5000',
+		},
+	},
 	compatibilityDate: '2024-11-01',
 	eslint: {
 		config: {
