@@ -65,7 +65,7 @@ export const authApi = {
 // Search related API calls
 export const searchApi = {
 	search: (query: string, page: number, limit: number) =>
-		api.get('/search', { params: { q: query, page, per_page: limit } }),
+		api.get('/bm25search', { params: { q: query, page, per_page: limit } }),
 	getRecipe: (recipeId: number) => api.get(`/recipe/${recipeId}`),
 };
 

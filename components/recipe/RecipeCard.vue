@@ -1,13 +1,30 @@
+<!-- components/RecipeCard.vue -->
 <template>
 	<div
-		class="recipe-card"
+		class="recipe-card group"
 		@click="handleClick"
 	>
 		<img
-			:src="recipe.image"
+			:src="recipe.image_url || '/maxres2.jpg'"
 			:alt="recipe.name"
+			class="w-full h-48 object-cover rounded group-hover:scale-105 transition-transform duration-300"
+			loading="lazy"
 		>
-		<h3>{{ recipe.name }}</h3>
+		<div class="p-4">
+			<h3 class="text-lg font-medium">
+				{{ recipe.name }}
+			</h3>
+			<p class="text-sm text-gray-600 truncate">
+				{{ recipe.description }}
+			</p>
+			<div class="flex flex-wrap gap-2 mt-2">
+				<span
+					v-for="tag in recipe.tags"
+					:key="tag"
+					class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded"
+				>{{ tag }}</span>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -28,26 +45,9 @@ const handleClick = () => {
 
 <style scoped>
 .recipe-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 0.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
+  @apply bg-white rounded-lg shadow overflow-hidden cursor-pointer;
 }
-
 .recipe-card:hover {
-  transform: scale(1.05);
-}
-
-img {
-  width: 100%;
-  height: 200px; /* Adjust as needed */
-  object-fit: cover;
-  border-radius: 8px 8px 0 0;
-}
-
-h3 {
-  margin-top: 0.5rem;
-  font-size: 1rem;
+  @apply shadow-lg;
 }
 </style>
