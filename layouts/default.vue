@@ -3,31 +3,28 @@
 		<!-- Navigation -->
 		<nav class="bg-white shadow">
 			<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-				<div class="relative flex justify-between h-16">
+				<div class="relative flex items-center justify-between h-16">
 					<!-- Left side: Logo & Desktop Links -->
-					<div class="flex items-center">
-						<div class="flex-shrink-0 flex items-center">
-							<NuxtLink
-								to="/"
-								class="text-xl font-bold text-indigo-600"
-							>
-								FoodBookmark
-							</NuxtLink>
-						</div>
-						<div class="hidden sm:flex sm:ml-6 sm:space-x-8">
+					<div class="flex items-center space-x-6">
+						<NuxtLink
+							to="/"
+							class="text-xl font-bold text-indigo-600 flex-shrink-0"
+						>
+							FoodBookmark
+						</NuxtLink>
+						<div class="hidden sm:flex sm:space-x-8">
 							<NuxtLink
 								v-if="isLoggedIn"
 								to="/search"
-								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors"
 								active-class="border-indigo-500 text-gray-900"
 							>
 								Search
 							</NuxtLink>
-							<!-- Logged in only -->
 							<NuxtLink
 								v-if="isLoggedIn"
 								to="/bookmarks"
-								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors"
 								active-class="border-indigo-500 text-gray-900"
 							>
 								My Bookmarks
@@ -36,12 +33,12 @@
 					</div>
 
 					<!-- Right side: Auth Buttons / Profile Dropdown & Mobile Menu Button -->
-					<div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+					<div class="flex items-center space-x-4">
 						<template v-if="isLoggedIn">
 							<!-- Profile dropdown -->
 							<div class="relative">
 								<button
-									class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+									class="bg-white rounded-full flex items-center justify-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 h-8 w-8"
 									@click.stop="profileMenuOpen = !profileMenuOpen"
 								>
 									<span class="sr-only">Open user menu</span>
@@ -71,7 +68,7 @@
 						<template v-else>
 							<NuxtLink
 								to="/login"
-								class="text-sm font-medium text-indigo-600 hover:text-indigo-500 mr-4"
+								class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
 							>
 								Sign in
 							</NuxtLink>
@@ -186,7 +183,7 @@
 		<footer class="bg-white py-4 border-t border-gray-200">
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<p class="text-center text-sm text-gray-500">
-					&copy; {{ new Date().getFullYear() }} FoodBookmark. All rights reserved.
+					© {{ new Date().getFullYear() }} FoodBookmark. All rights reserved.
 				</p>
 			</div>
 		</footer>
@@ -208,10 +205,7 @@ const isLoggedIn = computed(() => authStore.isLoggedIn);
 const user = computed(() => authStore.user);
 
 onMounted(() => {
-	// Initialize auth state on app mount
 	authStore.initAuth();
-
-	// Close the profile menu if clicking outside
 	document.addEventListener('click', (e) => {
 		const profileMenu = document.querySelector('.origin-top-right');
 		const profileButton = document.querySelector('.rounded-full.flex');
@@ -232,3 +226,12 @@ const logout = async () => {
 	router.push('/login');
 };
 </script>
+
+  <style scoped>
+  /* Optional: Add custom styles if Tailwind adjustments aren't enough */
+  nav {
+	position: sticky;
+	top: 0;
+	z-index: 50;
+  }
+  </style>
