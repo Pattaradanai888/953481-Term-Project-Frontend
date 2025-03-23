@@ -1,7 +1,8 @@
 <template>
 	<div
 		class="relative group rounded-lg overflow-hidden shadow-xl cursor-pointer transform transition duration-300 hover:scale-105"
-		@click="viewFolder(folder.id)"
+		:class="{ 'ring-2 ring-indigo-500 ring-offset-2': selected }"
+		@click="handleClick"
 	>
 		<div
 			class="w-full h-48 bg-cover bg-center"
@@ -43,12 +44,21 @@ import { useRouter } from 'vue-router';
 const props = defineProps({
 	folder: { type: Object, required: true },
 	defaultCover: { type: String, default: '/default-cover.jpg' },
+	selected: { type: Boolean, default: false },
+	mode: { type: String, default: 'navigate' }, // 'navigate' or 'select'
 });
 
-const emit = defineEmits(['edit', 'delete']);
+const emit = defineEmits(['edit', 'delete', 'select']);
 const router = useRouter();
 
-const viewFolder = (id) => {
-	router.push(`/folders/${id}`); // Navigate to folder detail page
+const handleClick = () => {
+	if (props.mode === 'select') {
+		// For index page: emit select event to filter recommendations
+		emit('select', props.folder.id);
+	}
+	else {
+		// For bookmark page: navigate to folder details
+		router.push(`/folders/${props.folder.id}`);
+	}
 };
 </script>

@@ -1,524 +1,336 @@
 <template>
 	<div>
-		<!-- Hero Banner Section -->
+		<!-- Hero Banner (unchanged) -->
 		<section class="relative">
 			<img
 				src="/premium_photo-1673108852141-e8c3c22a4a22.jpg"
-				alt="Table of food"
-				class="w-full h-[375px] object-cover"
+				alt="Delicious dishes"
+				class="w-full h-80 object-cover"
 			>
-			<div class="absolute inset-0 bg-black opacity-40" />
-			<div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-				<h1 class="text-4xl font-extrabold text-white sm:text-5xl">
-					Find and save your favorite dishes
+			<div class="absolute inset-0 bg-black opacity-50" />
+			<div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
+				<h1 class="text-4xl font-bold">
+					Discover Your Next Favorite Dish
 				</h1>
-				<p class="mt-4 max-w-xl text-xl text-white">
-					Get personalized recipe recommendations and bookmark your favorites.
+				<p class="mt-2 text-lg">
+					Personalized recommendations tailored just for you.
 				</p>
 			</div>
 		</section>
 
-		<!-- Main Content Section -->
-		<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-			<!-- Recommendations for Logged-In Users -->
+		<!-- Main Content -->
+		<section class="max-w-6xl mx-auto px-4 py-8">
 			<div v-if="isLoggedIn">
-				<h1 class="text-3xl font-bold text-gray-900 mb-8">
-					Your Personalized Recommendations
-				</h1>
-
-				<!-- Refresh Button for Recommendations -->
-				<button
-					class="mb-6 px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-					@click="refreshRecommendations"
-				>
-					<span
-						v-if="loading"
-						class="inline-block mr-2"
-					>
-						<svg
-							class="animate-spin h-5 w-5 text-white"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							/>
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							/>
-						</svg>
-					</span>
-					{{ loading ? 'Loading...' : 'Refresh Recommendations' }}
-				</button>
+				<!-- Welcome Section -->
+				<div class="text-center mb-8">
+					<h1 class="text-3xl font-bold text-gray-800">
+						Welcome back, {{ user?.username || 'User' }}!
+					</h1>
+					<p class="text-gray-600 mt-2">
+						Ready to explore more recipes?
+					</p>
+				</div>
 
 				<!-- Folder Selection -->
 				<div
 					v-if="folders.length > 0"
-					class="mb-6"
+					class="mb-8"
 				>
-					<label
-						for="folder-select"
-						class="block text-sm font-medium text-gray-700 mb-2"
-					>
-						Filter recommendations by folder:
-					</label>
-					<select
-						id="folder-select"
-						v-model="selectedFolder"
-						class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-						@change="getRecommendationsByFolder"
-					>
-						<option value="">
-							All Folders
-						</option>
-						<option
-							v-for="folder in folders"
-							:key="folder.folder_id"
-							:value="folder.folder_id"
-						>
-							{{ folder.name }}
-						</option>
-					</select>
-				</div>
-
-				<!-- Recommendation Lists -->
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-					<div
-						v-for="(list, index) in recommendationLists"
-						:key="index"
-						class="space-y-6"
-					>
-						<h2 class="text-xl font-semibold text-gray-900 mb-3">
-							{{ list.title }}
+					<div class="flex justify-between items-center mb-4">
+						<h2 class="text-xl font-semibold">
+							Your Folders
 						</h2>
-						<div
-							v-if="list.recipes.length === 0 && !loading"
-							class="bg-gray-50 rounded-lg p-6 text-center"
-						>
-							<p class="text-gray-500">
-								No recipes found in this category.
-							</p>
-						</div>
-						<div
-							v-for="recipe in list.recipes"
-							:key="recipe.recipe_id"
-							class="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition cursor-pointer"
-							@click="viewRecipeDetails(recipe)"
-						>
-							<img
-								:src="recipe.image_url || '/IMG_6538.jpg'"
-								:alt="recipe.name"
-								class="w-full h-48 object-cover"
-								loading="lazy"
-								@error="(e) => e.target.src = '/IMG_6538.jpg'"
+						<div class="flex items-center space-x-4">
+							<button
+								v-if="selectedFolder"
+								class="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
+								@click="clearFolderSelection"
 							>
-							<div class="p-4">
-								<h3 class="text-lg font-semibold truncate">
-									{{ recipe.name }}
-								</h3>
-								<p class="text-gray-600 text-sm mt-1 line-clamp-2">
-									{{ recipe.description }}
-								</p>
-								<div class="flex items-center mt-2">
-									<div class="flex">
-										<svg
-											v-for="i in 5"
-											:key="i"
-											class="h-5 w-5"
-											:class="i <= Math.round(recipe.aggregated_rating) ? 'text-amber-400 fill-current' : 'text-gray-300 fill-current'"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 20 20"
-										>
-											<path
-												d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-											/>
-										</svg>
-									</div>
-									<span class="ml-1 text-sm text-gray-500">
-										{{ recipe.aggregated_rating.toFixed(1) }} ({{ recipe.review_count }})
-									</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Blocked Content for Non-Signed-In Users -->
-			<div
-				v-else
-				class="relative"
-			>
-				<h1 class="text-3xl font-bold text-gray-900 mb-8">
-					Featured Recipes
-				</h1>
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-					<div
-						v-for="recipe in previewRecipes"
-						:key="recipe.id"
-						class="bg-white rounded-lg shadow overflow-hidden relative"
-					>
-						<img
-							:src="recipe.image || ''"
-							:alt="recipe.title"
-							class="w-full h-48 object-cover filter blur-sm"
-							loading="lazy"
-						>
-						<div class="p-4">
-							<h3 class="text-lg font-semibold text-gray-800">
-								{{ recipe.title }}
-							</h3>
-							<p class="text-gray-600">
-								{{ recipe.description }}
-							</p>
-						</div>
-					</div>
-				</div>
-				<!-- Medium-Style Blocker Overlay -->
-				<div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center text-center px-4">
-					<h2 class="text-3xl font-bold text-white">
-						Join FoodBookmark Today
-					</h2>
-					<p class="mt-4 text-lg text-white">
-						Unlock 200k+ recipes and personalized recommendations.
-					</p>
-					<div class="mt-6 flex flex-col sm:flex-row justify-center">
-						<NuxtLink
-							to="/register"
-							class="w-full sm:w-auto flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
-						>
-							Sign Up
-						</NuxtLink>
-						<NuxtLink
-							to="/login"
-							class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-3 flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
-						>
-							Sign In
-						</NuxtLink>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- Recipe Detail Modal -->
-		<div
-			v-if="showModal"
-			class="fixed inset-0 z-50 overflow-y-auto"
-			aria-labelledby="modal-title"
-			role="dialog"
-			aria-modal="true"
-		>
-			<div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-				<!-- Background overlay -->
-				<div
-					class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-					@click="closeModal"
-				/>
-				<!-- Modal panel -->
-				<div
-					class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-				>
-					<div
-						v-if="selectedRecipe"
-						class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
-					>
-						<div class="sm:flex sm:items-start">
-							<div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-								<h3
-									id="modal-title"
-									class="text-lg leading-6 font-medium text-gray-900"
+								<span class="mr-1">Clear Selection</span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
 								>
-									{{ selectedRecipe.name }}
-								</h3>
-								<div class="mt-4">
-									<img
-										:src="selectedRecipe.image_url || '/IMG_6538.jpg'"
-										:alt="selectedRecipe.name"
-										class="w-full h-48 object-cover rounded-md"
-									>
-									<div class="mt-4 space-y-4">
-										<p class="text-sm text-gray-500">
-											{{ selectedRecipe.description }}
-										</p>
-										<!-- Recipe details -->
-										<div v-if="recipeDetails">
-											<!-- Ingredients -->
-											<h4 class="font-medium text-gray-900 mt-4">
-												Ingredients
-											</h4>
-											<ul class="list-disc pl-5 mt-2 text-sm text-gray-600">
-												<li
-													v-for="ingredient in recipeDetails.ingredients"
-													:key="ingredient.ingredient_id"
-												>
-													{{ ingredient.quantity }} {{ ingredient.unit }} {{ ingredient.ingredient_name }} {{ ingredient.preparation_note }}
-												</li>
-											</ul>
-											<!-- Instructions -->
-											<h4 class="font-medium text-gray-900 mt-4">
-												Instructions
-											</h4>
-											<ol class="list-decimal pl-5 mt-2 text-sm text-gray-600">
-												<li
-													v-for="instruction in recipeDetails.instructions"
-													:key="instruction.instruction_id"
-													class="mb-2"
-												>
-													{{ instruction.instruction_text }}
-												</li>
-											</ol>
-										</div>
-										<div
-											v-else
-											class="text-center py-4"
-										>
-											<svg
-												class="animate-spin h-5 w-5 text-indigo-500 mx-auto"
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-											>
-												<circle
-													class="opacity-25"
-													cx="12"
-													cy="12"
-													r="10"
-													stroke="currentColor"
-													stroke-width="4"
-												/>
-												<path
-													class="opacity-75"
-													fill="currentColor"
-													d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-												/>
-											</svg>
-											<p class="mt-2 text-sm text-gray-500">
-												Loading recipe details...
-											</p>
-										</div>
-										<!-- Bookmark Controls -->
-										<div class="mt-4 border-t pt-4">
-											<div class="flex flex-col space-y-3">
-												<label
-													for="folder-dropdown"
-													class="block text-sm font-medium text-gray-700"
-												>
-													Bookmark to folder:
-												</label>
-												<select
-													id="folder-dropdown"
-													v-model="selectedFolderForBookmark"
-													class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-												>
-													<option
-														disabled
-														value=""
-													>
-														Select a folder
-													</option>
-													<option
-														v-for="folder in folders"
-														:key="folder.folder_id"
-														:value="folder.folder_id"
-													>
-														{{ folder.name }}
-													</option>
-												</select>
-												<div>
-													<label class="block text-sm font-medium text-gray-700">
-														Rating:
-													</label>
-													<div class="flex items-center mt-1">
-														<button
-															v-for="star in 5"
-															:key="star"
-															type="button"
-															class="focus:outline-none"
-															@click="bookmarkRating = star"
-														>
-															<svg
-																class="h-6 w-6"
-																:class="star <= bookmarkRating ? 'text-amber-400' : 'text-gray-300'"
-																xmlns="http://www.w3.org/2000/svg"
-																viewBox="0 0 20 20"
-																fill="currentColor"
-															>
-																<path
-																	d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-																/>
-															</svg>
-														</button>
-													</div>
-													<button
-														class="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-														@click="bookmarkRecipe"
-													>
-														Bookmark Recipe
-													</button>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
+							<NuxtLink
+								to="/bookmarks"
+								class="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
+							>
+								<span class="mr-1">View All Bookmarks</span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+									/>
+								</svg>
+							</NuxtLink>
 						</div>
 					</div>
-					<div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+						<FolderCard
+							v-for="folder in folders"
+							:key="folder.id"
+							:folder="folder"
+							:selected="selectedFolder === folder.id"
+							mode="select"
+							@select="selectFolder"
+						/>
+					</div>
+				</div>
+
+				<!-- Recommendations Section -->
+				<div
+					v-if="isLoggedIn"
+					class="mb-12"
+				>
+					<div class="flex justify-between items-center mb-6">
+						<h2 class="text-2xl font-bold text-gray-800">
+							{{ selectedFolder ? 'Recommendations for Your Selected Folder' : 'Your Personalized Recommendations' }}
+						</h2>
 						<button
-							type="button"
-							class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-							@click="closeModal"
+							:disabled="loading"
+							class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center transition-all"
+							@click="refreshRecommendations"
 						>
-							Close
+							<svg
+								v-if="loading"
+								class="animate-spin h-5 w-5 mr-2"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								/>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+								/>
+							</svg>
+							{{ loading ? 'Refreshing...' : 'Refresh' }}
 						</button>
 					</div>
+
+					<!-- Recommendation Lists: each displayed in a carousel -->
+					<div v-if="recommendationLists.length">
+						<div
+							v-for="(list, index) in recommendationLists"
+							:key="index"
+							class="mb-12"
+						>
+							<h3 class="text-xl font-semibold text-gray-700 mb-4">
+								{{ list.title }}
+							</h3>
+							<!-- Use the carousel component for each recommendation list -->
+							<RecommendationCarousel :recipes="list.recipes" />
+						</div>
+					</div>
+					<!-- Loading, No Recommendations, and Error States as before... -->
+					<div
+						v-else-if="loading"
+						class="bg-white rounded-lg shadow-lg p-8 text-center"
+					>
+						<div class="flex flex-col items-center justify-center py-8">
+							<svg
+								class="animate-spin h-12 w-12 text-indigo-500 mb-4"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								/>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+								/>
+							</svg>
+							<p class="text-lg text-gray-600">
+								Preparing your personalized recommendations...
+							</p>
+						</div>
+					</div>
+					<div
+						v-else-if="!loading && !recommendationLists.length"
+						class="bg-white rounded-lg shadow-lg p-8 text-center"
+					>
+						<div class="flex flex-col items-center py-8">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-16 w-16 text-gray-400 mb-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+								/>
+							</svg>
+							<h3 class="text-xl font-semibold text-gray-700 mb-2">
+								No recommendations available yet
+							</h3>
+							<p class="text-gray-600 mb-6">
+								Start bookmarking dishes you like to see personalized recommendations!
+							</p>
+							<NuxtLink
+								to="/explore"
+								class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+							>
+								Explore Recipes
+							</NuxtLink>
+						</div>
+					</div>
+					<div
+						v-if="error"
+						class="mt-4 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg flex items-start"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 mr-2 mt-0.5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
+						</svg>
+						{{ error }}
+					</div>
 				</div>
 			</div>
-		</div>
+
+			<!-- Non-Logged-In Content (unchanged) -->
+			<div
+				v-else
+				class="text-center py-12"
+			>
+				<h1 class="text-2xl font-bold text-gray-800 mb-4">
+					Welcome to FoodBookmark
+				</h1>
+				<p class="text-gray-600 mb-6">
+					Sign up to unlock personalized recipe recommendations.
+				</p>
+				<NuxtLink
+					to="/register"
+					class="px-6 py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+				>
+					Sign Up Now
+				</NuxtLink>
+			</div>
+		</section>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
+import { useRecommendationsStore } from '~/stores/recommendations';
+import FolderCard from '~/components/bookmark/FolderCard.vue';
+import { useFolderStore } from '~/stores/folder';
+import RecommendationCard from '~/components/RecommendationCard.vue'; // New component for individual recipe cards
 
 const authStore = useAuthStore();
+const recommendationsStore = useRecommendationsStore();
+const folderStore = useFolderStore();
+
+const user = computed(() => authStore.user);
 const isLoggedIn = computed(() => authStore.isLoggedIn);
-const loading = ref(false);
+const selectedFolder = ref<number | null>(null);
 
-// For Recommendations (Logged-In Users)
-const recommendationLists = ref([
-	{ title: 'From Your Bookmarks', recipes: [] },
-	{ title: 'From a Favorite Category', recipes: [] },
-	{ title: 'Random Suggestions', recipes: [] },
-]);
+// RecommendationLists object structure: { all: Recipe[], folder: Recipe[], random: Recipe[] }
+const recommendationLists = computed(() => recommendationsStore.recommendationLists);
+const loading = computed(() => recommendationsStore.loading);
+const error = computed(() => recommendationsStore.error);
+const folders = computed(() => folderStore.folders);
 
-// Sample preview recipes for non-signed-in users
-const previewRecipes = ref([
-	{ id: 1, title: 'Spaghetti Carbonara', description: 'Classic Italian pasta dish.', image: '' },
-	{ id: 2, title: 'Chicken Salad', description: 'Healthy mix of greens.', image: '' },
-	{ id: 3, title: 'Beef Burger', description: 'Juicy burger with toppings.', image: '' },
-]);
+// Watch for auth state changes
+watch(() => isLoggedIn.value, async (newValue) => {
+	if (newValue) {
+		await loadInitialData();
+	}
+}, { immediate: true });
 
-// Folder data for bookmarking
-const folders = ref([
-	{ folder_id: 1, name: 'Favorites' },
-	{ folder_id: 2, name: 'To Try' },
-	{ folder_id: 3, name: 'Healthy Choices' },
-]);
-
-// Selected folder for filtering recommendations and bookmarking
-const selectedFolder = ref('');
-const selectedFolderForBookmark = ref('');
-
-// Bookmark rating
-const bookmarkRating = ref(0);
-
-// For Recipe Modal
-const showModal = ref(false);
-const selectedRecipe = ref(null);
-const recipeDetails = ref(null);
-
-function refreshRecommendations() {
-	loading.value = true;
-	// Simulate API call delay
-	setTimeout(() => {
-		recommendationLists.value = [
-			{ title: 'From Your Bookmarks', recipes: getSampleRecipes() },
-			{ title: 'From a Favorite Category', recipes: getSampleRecipes() },
-			{ title: 'Random Suggestions', recipes: getSampleRecipes() },
-		];
-		loading.value = false;
-	}, 1500);
+async function loadInitialData() {
+	try {
+		recommendationsStore.$patch({ loading: true });
+		await Promise.all([
+			folderStore.fetchFolders(),
+			recommendationsStore.fetchRecommendations(),
+		]);
+	}
+	catch (error) {
+		console.error('Error loading initial data:', error);
+	}
 }
 
-function getSampleRecipes() {
-	return [
-		{
-			recipe_id: 1,
-			name: 'Vegan Bowl',
-			description: 'A plant-based meal.',
-			image_url: '',
-			aggregated_rating: 4.2,
-			review_count: 120,
-		},
-		{
-			recipe_id: 2,
-			name: 'Taco Fiesta',
-			description: 'Spicy and delicious.',
-			image_url: '',
-			aggregated_rating: 4.5,
-			review_count: 200,
-		},
-		{
-			recipe_id: 3,
-			name: 'Berry Smoothie',
-			description: 'Refreshing fruit smoothie.',
-			image_url: '',
-			aggregated_rating: 4.0,
-			review_count: 85,
-		},
-	];
+async function selectFolder(folderId: number) {
+	if (selectedFolder.value === folderId) return;
+	selectedFolder.value = folderId;
+	await recommendationsStore.fetchRecommendations(folderId);
 }
 
-function getRecommendationsByFolder() {
-	// Filter recommendations based on selected folder.
-	// For demonstration, we'll simply refresh recommendations.
-	refreshRecommendations();
+async function clearFolderSelection() {
+	selectedFolder.value = null;
+	await recommendationsStore.fetchRecommendations();
 }
 
-function viewRecipeDetails(recipe) {
-	selectedRecipe.value = recipe;
-	showModal.value = true;
-	// Simulate fetching detailed recipe info
-	recipeDetails.value = null;
-	setTimeout(() => {
-		recipeDetails.value = {
-			ingredients: [
-				{ ingredient_id: 1, quantity: '200', unit: 'g', ingredient_name: 'Pasta', preparation_note: '' },
-				{ ingredient_id: 2, quantity: '100', unit: 'g', ingredient_name: 'Pancetta', preparation_note: 'diced' },
-				{ ingredient_id: 3, quantity: '2', unit: '', ingredient_name: 'Eggs', preparation_note: 'beaten' },
-			],
-			instructions: [
-				{ instruction_id: 1, instruction_text: 'Boil pasta until al dente.' },
-				{ instruction_id: 2, instruction_text: 'Fry pancetta until crispy.' },
-				{ instruction_id: 3, instruction_text: 'Mix eggs with cheese and combine with pasta and pancetta.' },
-			],
-		};
-	}, 1000);
+async function refreshRecommendations() {
+	const folderId = selectedFolder.value;
+	await recommendationsStore.refreshRecommendations(folderId || undefined);
 }
 
-function closeModal() {
-	showModal.value = false;
-	selectedRecipe.value = null;
-	recipeDetails.value = null;
-}
-
-function bookmarkRecipe() {
-	// Logic to bookmark the recipe with selectedFolderForBookmark and bookmarkRating
-	alert(`Recipe bookmarked in folder ${selectedFolderForBookmark.value} with rating ${bookmarkRating.value}`);
-	// Reset selection after bookmarking
-	selectedFolderForBookmark.value = '';
-	bookmarkRating.value = 0;
-}
-
-onMounted(() => {
+onMounted(async () => {
 	if (isLoggedIn.value) {
-		refreshRecommendations();
+		await loadInitialData();
 	}
 });
 </script>
 
   <style scoped>
-  /* Optional custom style for line-clamp (if not using Tailwind's plugin) */
+  .line-clamp-1 {
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+  }
+
   .line-clamp-2 {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;

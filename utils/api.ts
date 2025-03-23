@@ -80,10 +80,18 @@ export const folderApi = {
 		headers: { 'Content-Type': 'multipart/form-data' },
 	}),
 	deleteFolder: (folderId: number) => api.delete(`/folder/${folderId}`),
+	getFolderSuggestions: (folderId: number) => api.get(`/folder/${folderId}/suggestions`),
 };
 
 // Bookmark related API calls
 export const bookmarkApi = {
 	createBookmark: (recipeId: number, folderId: number, rating: number) =>
 		api.post('/bookmark', { recipe_id: recipeId, folder_id: folderId, rating }),
+	removeBookmark(bookmarkId: number) {
+		api.delete(`/api/bookmarks/${bookmarkId}`);
+	},
+	getBookmarksForRecipe(recipeId: number) {
+		api.get(`/api/bookmarks/recipe/${recipeId}`);
+	},
+
 };

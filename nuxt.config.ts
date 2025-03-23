@@ -7,6 +7,7 @@ export default defineNuxtConfig({
 		'@nuxtjs/tailwindcss',
 		'@pinia/nuxt',
 		'@nuxt/eslint',
+		'vue3-carousel-nuxt',
 	],
 	devtools: { enabled: true },
 	runtimeConfig: {
