@@ -8,6 +8,8 @@ export default defineNuxtConfig({
 		'@pinia/nuxt',
 		'@nuxt/eslint',
 		'vue3-carousel-nuxt',
+		'@vee-validate/nuxt',
+		'pinia-plugin-persistedstate/nuxt',
 	],
 	devtools: { enabled: true },
 	runtimeConfig: {
@@ -23,6 +25,15 @@ export default defineNuxtConfig({
 				semi: true,
 				// ...
 			},
+		},
+	},
+	veeValidate: {
+		autoImports: true,
+		componentNames: {
+			Form: 'VeeForm',
+			Field: 'VeeField',
+			FieldArray: 'VeeFieldArray',
+			ErrorMessage: 'VeeErrorMessage',
 		},
 	},
 });
