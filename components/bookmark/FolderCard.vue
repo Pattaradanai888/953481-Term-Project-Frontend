@@ -43,7 +43,7 @@ import { useRouter } from 'vue-router';
 
 const props = defineProps({
 	folder: { type: Object, required: true },
-	defaultCover: { type: String, default: '/default-cover.jpg' },
+	defaultCover: { type: String, default: '/maxres2.jpg' },
 	selected: { type: Boolean, default: false },
 	mode: { type: String, default: 'navigate' }, // 'navigate' or 'select'
 });
