@@ -95,6 +95,24 @@
 						/>
 					</div>
 				</div>
+				<!-- No Folders Message -->
+				<div
+					v-else
+					class="mb-8 text-center bg-white rounded-lg shadow-lg p-8"
+				>
+					<h2 class="text-xl font-semibold mb-2">
+						No Folders Yet
+					</h2>
+					<p class="text-gray-600 mb-4">
+						Create your first folder to start organizing your bookmarked recipes.
+					</p>
+					<NuxtLink
+						to="/bookmarks"
+						class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+					>
+						Create Folder
+					</NuxtLink>
+				</div>
 
 				<!-- Recommendations Section -->
 				<div
@@ -135,21 +153,24 @@
 						</button>
 					</div>
 
-					<!-- Recommendation Lists: each displayed in a carousel -->
-					<div v-if="recommendationLists.length">
+					<!-- Recommendation Lists -->
+					<div
+						v-if="hasRecommendations"
+						class="space-y-12"
+					>
 						<div
-							v-for="(list, index) in recommendationLists"
+							v-for="(list, index) in filteredRecommendationLists"
 							:key="index"
 							class="mb-12"
 						>
 							<h3 class="text-xl font-semibold text-gray-700 mb-4">
-								{{ list.title }}
+								{{ list.title }} ({{ list.recipes.length }} {{ list.recipes.length === 1 ? 'item' : 'items' }})
 							</h3>
-							<!-- Use the carousel component for each recommendation list -->
 							<RecommendationCarousel :recipes="list.recipes" />
 						</div>
 					</div>
-					<!-- Loading, No Recommendations, and Error States as before... -->
+
+					<!-- Loading State -->
 					<div
 						v-else-if="loading"
 						class="bg-white rounded-lg shadow-lg p-8 text-center"
@@ -180,8 +201,10 @@
 							</p>
 						</div>
 					</div>
+
+					<!-- Empty State (No Bookmarks or Folders) -->
 					<div
-						v-else-if="!loading && !recommendationLists.length"
+						v-else
 						class="bg-white rounded-lg shadow-lg p-8 text-center"
 					>
 						<div class="flex flex-col items-center py-8">
@@ -200,19 +223,21 @@
 								/>
 							</svg>
 							<h3 class="text-xl font-semibold text-gray-700 mb-2">
-								No recommendations available yet
+								No Recommendations Available Yet
 							</h3>
 							<p class="text-gray-600 mb-6">
 								Start bookmarking dishes you like to see personalized recommendations!
 							</p>
 							<NuxtLink
-								to="/explore"
+								to="/search"
 								class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
 							>
 								Explore Recipes
 							</NuxtLink>
 						</div>
 					</div>
+
+					<!-- Error Display -->
 					<div
 						v-if="error"
 						class="mt-4 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg flex items-start"
@@ -236,7 +261,7 @@
 				</div>
 			</div>
 
-			<!-- Non-Logged-In Content (unchanged) -->
+			<!-- Non-Logged-In Content -->
 			<div
 				v-else
 				class="text-center py-12"
@@ -262,9 +287,9 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useRecommendationsStore } from '~/stores/recommendations';
-import FolderCard from '~/components/bookmark/FolderCard.vue';
 import { useFolderStore } from '~/stores/folder';
-import RecommendationCard from '~/components/RecommendationCard.vue'; // New component for individual recipe cards
+import FolderCard from '~/components/bookmark/FolderCard.vue';
+import RecommendationCarousel from '~/components/RecommendationCarousel.vue';
 
 const authStore = useAuthStore();
 const recommendationsStore = useRecommendationsStore();
@@ -274,13 +299,20 @@ const user = computed(() => authStore.user);
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const selectedFolder = ref<number | null>(null);
 
-// RecommendationLists object structure: { all: Recipe[], folder: Recipe[], random: Recipe[] }
 const recommendationLists = computed(() => recommendationsStore.recommendationLists);
 const loading = computed(() => recommendationsStore.loading);
 const error = computed(() => recommendationsStore.error);
 const folders = computed(() => folderStore.folders);
 
-// Watch for auth state changes
+// Filter out empty recommendation lists and check if there are any valid recommendations
+const filteredRecommendationLists = computed(() =>
+	recommendationLists.value.filter(list => list.recipes.length > 0),
+);
+const hasRecommendations = computed(() =>
+	filteredRecommendationLists.value.length > 0
+	&& (folders.value.length > 0 || selectedFolder.value !== null),
+);
+
 watch(() => isLoggedIn.value, async (newValue) => {
 	if (newValue) {
 		await loadInitialData();
@@ -295,8 +327,8 @@ async function loadInitialData() {
 			recommendationsStore.fetchRecommendations(),
 		]);
 	}
-	catch (error) {
-		console.error('Error loading initial data:', error);
+	catch (err) {
+		console.error('Error loading initial data:', err);
 	}
 }
 
