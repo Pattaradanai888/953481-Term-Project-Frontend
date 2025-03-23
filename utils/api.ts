@@ -88,10 +88,13 @@ export const bookmarkApi = {
 	createBookmark: (recipeId: number, folderId: number, rating: number) =>
 		api.post('/bookmark', { recipe_id: recipeId, folder_id: folderId, rating }),
 	removeBookmark(bookmarkId: number) {
-		api.delete(`/api/bookmarks/${bookmarkId}`);
+		api.delete(`/bookmark/${bookmarkId}`);
 	},
 	getBookmarksForRecipe(recipeId: number) {
-		api.get(`/api/bookmarks/recipe/${recipeId}`);
+		api.get(`/bookmark/recipe/${recipeId}`);
+	},
+	getBookmarksForFolder(folderId: number) {
+		api.get(`/folder/${folderId}/bookmark`);
 	},
 
 };
